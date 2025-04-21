@@ -78,5 +78,6 @@ ax.legend(ncol=2, **fs_small_p)
 ax.set_xlabel(r"$t_{\mathrm{sep}}$", **fs_p)
 ax.set_ylabel(r"$m_{\mathrm{eff}}$", **fs_p)
 plt.tight_layout()
+plt.savefig("../output/plots/pion_meff.pdf", transparent=True)
 plt.show()
 # %%

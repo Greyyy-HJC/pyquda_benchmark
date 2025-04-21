@@ -55,8 +55,8 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
     # Contract to get correlation function
     wall_quark_corr.append(
         core.gatherLattice(
-            contract("wtzyxjiba, jk -> wtzyxkiba", wall_propag.data, G5).real.get(), 
-            [0, -1, -1, -1]
+            core.lexico(contract("wtzyxjiba, jk -> wtzyxkiba", wall_propag.data, G5).real.get(), [0,1,2,3,4]), 
+            [0, 1, 2, 3]
         )
     )
     
@@ -67,17 +67,19 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
     # Contract to get correlation function
     point_quark_corr.append(
         core.gatherLattice(
-            contract("wtzyxjiba, jk -> wtzyxkiba", point_propag.data, G5).real.get(), 
-            [0, -1, -1, -1]
-        )
+            core.lexico(contract("wtzyxjiba, jk -> wtzyxkiba", point_propag.data, G5).real.get(), [0,1,2,3,4]), 
+            [0, 1, 2, 3]
+        )[0, 0, :, 0]
     )
 
 # Clean up resources
 dirac.destroy()
 
+print("\n>>> shape of point_quark_corr: ", point_quark_corr[0].shape)
+
 # Print first few entries of the correlation functions
-print("Point source, conf 0: ", point_quark_corr[0][:6])
-print("Wall source, conf 0: ", wall_quark_corr[0][:6])
+# print("Point source, conf 0: ", point_quark_corr[0][:6])
+# print("Wall source, conf 0: ", wall_quark_corr[0][:6])
 
 # %%
 
