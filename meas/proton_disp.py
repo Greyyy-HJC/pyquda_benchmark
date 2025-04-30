@@ -52,7 +52,6 @@ T[int(Lt/2) : int(Lt/2) + Lt] = 1
 
 # momentum list
 momentum_list = [[0, 0, 0], [0, 0, 1], [0, 0, 2], [0, 0, 3], [0, 0, 4]]
-momentum_phase = phase.MomentumPhase(latt_info).getPhases(momentum_list)
 
 # source time position
 t_src_list = list(range(0, Lt, int(Lt/4)))
@@ -79,33 +78,37 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
         T_ = T[Lt - t_src : 2 * Lt - t_src][latt_info.gt * latt_info.Lt : (latt_info.gt + 1) * latt_info.Lt]
         
         # build proton operator for each momentum
-        for a, b, c in permutations(tuple(range(3))):
-            for d, e, f in permutations(tuple(range(3))):
-                sign = 1 if b == (a + 1) % 3 else -1
-                sign *= 1 if e == (d + 1) % 3 else -1
-                
-                # add momentum projection
-                proton[t_idx] += (sign * T_) * contract(
-                    "pwtzyx,ij,kl,tmn,wtzyxik,wtzyxjl,wtzyxmn->pt",
-                    momentum_phase,
-                    C @ GT5,
-                    C @ GT5,
-                    P_,
-                    propag.data[:, :, :, :, :, :, :, a, d],
-                    propag.data[:, :, :, :, :, :, :, b, e],
-                    propag.data[:, :, :, :, :, :, :, c, f],
-                )
-                
-                proton[t_idx] += (sign * T_) * contract(
-                    "pwtzyx,ij,kl,tmn,wtzyxik,wtzyxjn,wtzyxml->pt",
-                    momentum_phase,
-                    C @ GT5,
-                    C @ GT5,
-                    P_,
-                    propag.data[:, :, :, :, :, :, :, a, d],
-                    propag.data[:, :, :, :, :, :, :, b, e],
-                    propag.data[:, :, :, :, :, :, :, c, f],
-                )
+        for p_idx, momentum in enumerate(momentum_list):
+            # calculate momentum phase for this specific momentum
+            momentum_phase = phase.MomentumPhase(latt_info).getPhases([momentum])
+            
+            for a, b, c in permutations(tuple(range(3))):
+                for d, e, f in permutations(tuple(range(3))):
+                    sign = 1 if b == (a + 1) % 3 else -1
+                    sign *= 1 if e == (d + 1) % 3 else -1
+                    
+                    # add momentum projection (using only the single momentum)
+                    proton[t_idx, p_idx] += (sign * T_) * contract(
+                        "wtzyx,ij,kl,tmn,wtzyxik,wtzyxjl,wtzyxmn->t",
+                        momentum_phase[0],  # Use index 0 since we only have one momentum
+                        C @ GT5,
+                        C @ GT5,
+                        P_,
+                        propag.data[:, :, :, :, :, :, :, a, d],
+                        propag.data[:, :, :, :, :, :, :, b, e],
+                        propag.data[:, :, :, :, :, :, :, c, f],
+                    )
+                    
+                    proton[t_idx, p_idx] += (sign * T_) * contract(
+                        "wtzyx,ij,kl,tmn,wtzyxik,wtzyxjn,wtzyxml->t",
+                        momentum_phase[0],  # Use index 0 since we only have one momentum
+                        C @ GT5,
+                        C @ GT5,
+                        P_,
+                        propag.data[:, :, :, :, :, :, :, a, d],
+                        propag.data[:, :, :, :, :, :, :, b, e],
+                        propag.data[:, :, :, :, :, :, :, c, f],
+                    )
                 
     # collect results for each configuration
     proton_tmp = core.gatherLattice(proton.real.get(), [2, -1, -1, -1])
