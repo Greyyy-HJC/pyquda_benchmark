@@ -11,7 +11,6 @@ from pyquda_utils import core, io, gamma, source
 
 from lametlat.utils.plot_settings import *
 from lametlat.utils.resampling import *
-from lametlat.preprocess.read_raw import pt2_to_meff
 
 if not os.path.exists(".cache"):
     os.makedirs(".cache")
@@ -30,7 +29,7 @@ G5 = gamma.gamma(15)
 G4 = gamma.gamma(8)
 G0 = gamma.gamma(0)
 
-Gamma_curr = G4
+Gamma_curr = G0
 
 latt_info = core.LatticeInfo([8, 8, 8, 32], -1, xi_0 / nu)
 Ls = latt_info.global_size[0]
@@ -72,11 +71,10 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
             seq_propag = core.invertPropagator(dirac, seq_source)
             
             pt3_conf[t_idx, t_sep_idx] += contract(
-                "etzyxjiba,jk,etzyxklba,li->t",
+                "etzyxjiba,jk,etzyxkiba->t",
                 point_propag.data.conj(),
                 G5 @ Gamma_curr,
                 seq_propag.data,
-                G5 @ G5,
             )
     pt2_tmp = core.gatherLattice(pt2_conf.real.get(), [0, -1, -1, -1])
     pt3_tmp = core.gatherLattice(pt3_conf.real.get(), [0, -1, -1, -1])
@@ -128,4 +126,15 @@ plt.tight_layout()
 plt.savefig("../output/plots/pion_3pt_ratio.pdf", transparent=True)
 plt.show()
 
+# Plot the meff
+from lametlat.preprocess.read_raw import pt2_to_meff
+
+pion_meff = pt2_to_meff(pt2_pion_jk_avg, boundary="periodic")
+
+fig, ax = default_plot()
+ax.errorbar(np.arange(len(pion_meff)), gv.mean(pion_meff), yerr=gv.sdev(pion_meff), **errorb)
+ax.set_xlabel("t", **fs_p)
+ax.set_ylabel("m_eff", **fs_p)
+plt.tight_layout()
+plt.show()
 # %%

@@ -2,6 +2,7 @@
 from itertools import permutations
 from pyquda import init
 import numpy as np
+import os
 import cupy as cp
 from opt_einsum import contract
 from matplotlib import pyplot as plt
@@ -12,6 +13,10 @@ from pyquda_utils import core, io, gamma, source
 from lametlat.utils.plot_settings import *
 from lametlat.utils.resampling import *
 from lametlat.preprocess.read_raw import pt2_to_meff
+
+if not os.path.exists(".cache"):
+    os.makedirs(".cache")
+    print("Created .cache directory for PyQUDA resources")
 
 init([1, 1, 1, 1], resource_path=".cache")
 Ls = 8
@@ -24,7 +29,7 @@ csw_r = 1.02868
 csw_t = 1.02868
 multigrid = None # [[4, 4, 4, 4], [2, 2, 2, 8]]
 
-N_conf = 50
+N_conf = 20
 
 latt_info = core.LatticeInfo([Ls, Ls, Ls, Lt], -1, xi_0 / nu)
 dirac = core.getClover(latt_info, mass, 1e-8, 10000, xi_0, csw_r, csw_t, multigrid)
