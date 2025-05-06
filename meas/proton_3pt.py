@@ -26,7 +26,7 @@ csw_r = 1.02868
 csw_t = 1.02868
 multigrid = None 
 
-N_conf = 10
+N_conf = 1
 
 
 # Lattice and solver setup
@@ -89,6 +89,7 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
         P_ = cp.roll(P, t_src, 0)[latt_info.gt * latt_info.Lt : (latt_info.gt + 1) * latt_info.Lt]
         T_ = T[Lt - t_src : 2 * Lt - t_src][latt_info.gt * latt_info.Lt : (latt_info.gt + 1) * latt_info.Lt]
         
+        
         pt2_conf[t_idx] += contract(
             "abc, def, ij, kl, tmn, wtzyxikad, wtzyxjlbe, wtzyxmncf->t",
             epsilon,    epsilon,    C @ G5,    C @ G5,    P_,
@@ -143,8 +144,8 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
 
     # Gather and average over spatial lattice
     pt2_tmp = core.gatherLattice(pt2_conf.real.get(), [1, -1, -1, -1])
-    pt3_tmp_gA = core.gatherLattice(pt3_conf_gA.real.get(), [1, -1, -1, -1])
-    pt3_tmp_gV = core.gatherLattice(pt3_conf_gV.real.get(), [1, -1, -1, -1])
+    pt3_tmp_gA = core.gatherLattice(pt3_conf_gA.real.get(), [2, -1, -1, -1]) # * since the 3pt has one more dimension of tsep
+    pt3_tmp_gV = core.gatherLattice(pt3_conf_gV.real.get(), [2, -1, -1, -1])
 
     if latt_info.mpi_rank == 0:
         for t_idx, t_src in enumerate(t_src_list):
