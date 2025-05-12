@@ -125,6 +125,18 @@ proton_jk_avg = jk_ls_avg(proton_jk)
 pion_meff = pt2_to_meff(pion_jk_avg, boundary="periodic")
 proton_meff = pt2_to_meff(proton_jk_avg, boundary="periodic")
 
+
+fig, ax = default_plot()
+ax.errorbar(np.arange(Lt), gv.mean(pion_jk_avg), yerr=gv.sdev(pion_jk_avg), label="pion", **errorb)
+ax.errorbar(np.arange(Lt), gv.mean(proton_jk_avg), yerr=gv.sdev(proton_jk_avg), label="proton", **errorb)
+ax.legend(ncol=2, **fs_small_p)
+ax.set_xlabel(r"$t$", **fs_p)
+ax.set_ylabel(r"$2pt$", **fs_p)
+ax.set_yscale("log")
+plt.tight_layout()
+plt.show()
+
+
 fig, ax = default_plot()
 ax.errorbar(np.arange(Lt-2), gv.mean(pion_meff), yerr=gv.sdev(pion_meff), label="pion", **errorb)
 ax.errorbar(np.arange(Lt-2), gv.mean(proton_meff), yerr=gv.sdev(proton_meff), label="proton", **errorb)
