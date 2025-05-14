@@ -26,7 +26,7 @@ csw_r = 1.02868
 csw_t = 1.02868
 multigrid = None 
 
-N_conf = 10
+N_conf = 50
 
 
 # Lattice and solver setup
@@ -34,6 +34,7 @@ latt_info = core.LatticeInfo([8, 8, 8, 32], -1, xi_0 / nu)
 Ls = latt_info.global_size[0]
 Lt = latt_info.global_size[3]
 dirac = core.getClover(latt_info, mass, 1e-8, 10000, xi_0, csw_r, csw_t, multigrid)
+
 
 # * gamma.gamma(n) is the same as QLUA setting
 C = gamma.gamma(2) @ gamma.gamma(8)
@@ -43,21 +44,25 @@ G5 = gamma.gamma(15)
 G5Z = gamma.gamma(11)
 
 GS = G0
-GA = G5Z
+GA = -1j * G5Z #todo
 GV = G4
 
 # 质子投影算符
-P = cp.zeros((Lt, 4, 4), "<c16")
-P[:int(Lt/2)] = (G0 + G4) / 2  # 正宇称投影
-P[int(Lt/2):] = (G0 - G4) / 2   # 负宇称投影
-P_3pt = 0.5 * (G0 + G4) @ (G0 - G5Z)
+P_pos = 0.5 * (G0 + G4)
+P_neg = 0.5 * (G0 - G4)
+
+P_2pt = cp.zeros((Lt, 4, 4), "<c16")
+P_2pt[:Lt//2] = P_pos  # 正宇称投影
+P_2pt[Lt//2:] = P_neg   # 负宇称投影
+# P_3pt = 0.5 * (G0 + G4) @ (G0 - G5Z)
+P_3pt = GA @ P_pos + GV @ P_pos
 T = cp.ones((2 * Lt), "<f8")
 T[:] = -1
-T[int(Lt/2) : int(Lt/2) + Lt] = 1
+T[Lt // 2 : Lt // 2 + Lt] = 1
 
 # Source/sink separations and ensemble size
 t_src_list = [0] # list(range(0, Lt, int(Lt/4)))
-t_sep_list = [8, 10, 12, 14]
+t_sep_list = [7, 8, 9, 10, 11, 12]
 
 epsilon= cp.zeros((3,3,3))
 for a in range (3):
@@ -81,67 +86,70 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
 
     gauge = io.readNERSCGauge(f"../conf/S8T32/wilson_b6.{cfg}")
     dirac.loadGauge(gauge)
+    # gauge.stoutSmear(1, 0.125, 4)
 
     for t_idx, t_src in enumerate(t_src_list):
         # create point source and compute propagator
         point_source = source.propagator(latt_info, "point", [0, 0, 0, t_src])
-        point_propag = core.invertPropagator(dirac, point_source)
+        point_propag = core.invertPropagator(dirac, point_source, mrhs=4)
+        
                 
         
         #! 2pt: proton two-point function
-        P_ = cp.roll(P, t_src, 0)[latt_info.gt * latt_info.Lt : (latt_info.gt + 1) * latt_info.Lt]
+        P_ = cp.roll(P_2pt, t_src, 0)[latt_info.gt * latt_info.Lt : (latt_info.gt + 1) * latt_info.Lt]
         T_ = T[Lt - t_src : 2 * Lt - t_src][latt_info.gt * latt_info.Lt : (latt_info.gt + 1) * latt_info.Lt]
         
         
-        pt2_conf[t_idx] += T_ * contract(
+        pt2_conf[t_idx] += T_ * (
+            contract(
             "abc, def, ij, kl, tmn, wtzyxikad, wtzyxjlbe, wtzyxmncf->t",
             epsilon,    epsilon,    C @ G5,    C @ G5,    P_,
             point_propag.data,  point_propag.data,  point_propag.data,
+            )
+            + contract(
+                "abc, def, ij, kl, tmn, wtzyxikad, wtzyxjnbe, wtzyxmlcf->t",
+                epsilon,    epsilon,    C @ G5,    C @ G5,    P_,
+                point_propag.data,  point_propag.data,  point_propag.data,
+            )
         )
-        + T_ * contract(
-            "abc, def, ij, kl, tmn, wtzyxikad, wtzyxjnbe, wtzyxmlcf->t",
-            epsilon,    epsilon,    C @ G5,    C @ G5,    P_,
-            point_propag.data,  point_propag.data,  point_propag.data,
-        )
-        # - T_ * contract(
-        #     "abc, def, ij, kl, tmn, wtzyxikad, wtzyxjnbf, wtzyxmlce->t",
-        #     epsilon,    epsilon,    C @ G5,    C @ G5,    P_,
-        #     point_propag.data,  point_propag.data,  point_propag.data,
-        # )
 
+        
         #! 3pt: proton 3-point function with sequential source technique
-        for t_sep_idx, t_sep in enumerate(t_sep_list):
-            t_snk = (t_src + t_sep) % Lt
-            
-            # Create sequential source at sink position
-            seq_source = core.LatticePropagator(latt_info)
-            
-            seq_temp = contract(
+        # Create sequential source at sink position
+        seq_temp = (
+            contract(
                 "abc, def, ij, kl, mn, wtzyxikad, wtzyxjlbe -> wtzyxmncf",
                 epsilon,    epsilon,    C@G5,    C@G5,    P_3pt,
                 point_propag.data,  point_propag.data
             )
             + contract(
-                "abc, def, ij, kl, mn, wtzyxikad, wtzyxmncf -> wtzyxjlbe",
+                "abc, def, ij, kl, mn, wtzyxmkad, wtzyxjlbe -> wtzyxincf",
                 epsilon,    epsilon,    C@G5,    C@G5,    P_3pt,
                 point_propag.data,  point_propag.data
             )
             + contract(
-                "abc, def, ij, kl, mn, wtzyxikad, wtzyxmlce -> wtzyxjnbf",
+                "abc, def, ij, kl, mn, wtzyxikad, wtzyxjnbe -> wtzyxmlcf",
                 epsilon,    epsilon,    C@G5,    C@G5,    P_3pt,
                 point_propag.data,  point_propag.data
             ) 
             + contract(
-                "abc, def, ij, kl, mn, wtzyxikad, wtzyxjnbf  -> wtzyxmlce",
+                "abc, def, ij, kl, mn, wtzyxmkad, wtzyxjnbe  -> wtzyxilcf",
                 epsilon,    epsilon,    C@G5,    C@G5,    P_3pt,
                 point_propag.data,  point_propag.data
             )
+        )
+        
+        seq_source_demo = core.LatticePropagator(
+            latt_info,
+            contract("ij,wtzyxjkab,kl->wtzyxilab", G5, seq_temp.conj(), G5)
+        )
+
+        for t_sep_idx, t_sep in enumerate(t_sep_list):
+            t_snk = (t_src + t_sep) % Lt
             
-            
-            seq_source.data = contract("ij,wtzyxjkab,kl->wtzyxilab", G5, seq_temp.conj(), G5)
-            seq_source = source.sequential12(seq_source, t_snk)
-            seq_propag = core.invertPropagator(dirac, seq_source)
-            
+            seq_source = source.sequential12(seq_source_demo, t_snk)
+            seq_propag = core.invertPropagator(dirac, seq_source, mrhs=4)
+        
             pt3_conf_gA[t_idx, t_sep_idx] += contract(
                 "ni, wtzyxjicf, jk, km, wtzyxmncf -> t",
                 G5, seq_propag.data.conj(), G5, GA, point_propag.data  
@@ -176,8 +184,6 @@ dirac.destroy()
 
 # %%
 # Jackknife and average
-
-t_sep_list = [8, 10, 12, 14]
 
 print("shape of pt2_proton: ", np.shape(pt2_proton))
 print("shape of pt3_proton_gA_real: ", np.shape(pt3_proton_gA_real))
@@ -255,7 +261,7 @@ ax.set_xlabel("τ (current insertion time)", **fs_p)
 ax.set_ylabel("Ratio", **fs_p)
 ax.set_title("gA (real part)", **fs_p)
 ax.legend(**fs_small_p)
-ax.set_ylim(-2, 2)
+ax.set_ylim(-0.5, 2.5)
 plt.tight_layout()
 plt.show()
 
@@ -275,7 +281,7 @@ ax.set_xlabel("τ (current insertion time)", **fs_p)
 ax.set_ylabel("Ratio", **fs_p)
 ax.set_title("gV (real part)", **fs_p)
 ax.legend(**fs_small_p)
-ax.set_ylim(-2, 2)
+ax.set_ylim(-0.5, 2.5)
 plt.tight_layout()
 plt.show()
 
