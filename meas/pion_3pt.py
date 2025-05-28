@@ -77,7 +77,7 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
                 seq_propag.data,
             )
     pt2_tmp = core.gatherLattice(pt2_conf.real.get(), [1, -1, -1, -1])
-    pt3_tmp = core.gatherLattice(pt3_conf.real.get(), [2, -1, -1, -1]) # * since the 3pt has one more dimension of tsep
+    pt3_tmp = core.gatherLattice(pt3_conf.real.get(), [2, -1, -1, -1]) # * since the 3pt has one more dimension of tsep, 2 means the axis 2 is the latt_info.Lt that needs to be gathered
     
     if latt_info.mpi_rank == 0:
         pt2_pion.append(pt2_tmp.mean(0))

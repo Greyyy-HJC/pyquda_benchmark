@@ -96,8 +96,8 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
 
     gauge.pure_gauge.freeGauge()
 
-    wall_pion_DA_tmp = core.gatherLattice(wall_pion_DA_tmp.real.get(), [1, -1, -1, -1])
-    point_pion_DA_tmp = core.gatherLattice(point_pion_DA_tmp.real.get(), [1, -1, -1, -1])
+    wall_pion_DA_tmp = core.gatherLattice(wall_pion_DA_tmp.real.get(), [2, -1, -1, -1])
+    point_pion_DA_tmp = core.gatherLattice(point_pion_DA_tmp.real.get(), [2, -1, -1, -1])
     
     if latt_info.mpi_rank == 0:
         for idt, t_src in enumerate(t_src_list):
