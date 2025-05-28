@@ -41,7 +41,8 @@ C = gamma.gamma(2) @ gamma.gamma(8)
 G0 = gamma.gamma(0)
 G4 = gamma.gamma(8)
 G5 = gamma.gamma(15)
-G5Z = gamma.gamma(11)
+# G5Z = gamma.gamma(11)
+G5Z = gamma.gamma(4) @ gamma.gamma(15)
 
 GS = G0
 GA = -1j * G5Z #todo

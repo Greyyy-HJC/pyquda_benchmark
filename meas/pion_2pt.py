@@ -42,6 +42,7 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
     wall_propag = core.invertPropagator(dirac, wall_source)
 
     # wtzyxjiba are indices of the propagator, ->t means contract all indices except t
+    # indices are: even/odd, t, z, y, x, spin, spin, color, color
     # [0, -1, -1, -1] means keep the t direction and sum over the other directions, 1 means gather the data, 0 means no action, -1 means sum / average
     wall_pion.append(
         core.gatherLattice(
