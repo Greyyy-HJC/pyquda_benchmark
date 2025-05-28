@@ -34,66 +34,82 @@ G5 = gamma.gamma(15)
 
 latt_info = core.LatticeInfo([8, 8, 8, 32], -1, xi_0 / nu)
 dirac = core.getClover(latt_info, mass, 1e-8, 10000, xi_0, csw_r, csw_t, multigrid)
+t_src_list = list(range(0, latt_info.Lt, int(latt_info.Lt/4)))
 z_list = list(range(8))
 
-wall_pion_DA = cp.zeros((N_conf, len(z_list), latt_info.Lt), "<c16")
-point_pion_DA = cp.zeros((N_conf, len(z_list), latt_info.Lt), "<c16")
+wall_pion_DA = []
+point_pion_DA = []
 for cfg in tqdm(range(N_conf), desc="Processing configurations"):
     gauge = io.readNERSCGauge(f"../conf/S8T32/wilson_b6.{cfg}")
-
     # gauge.stoutSmear(1, 0.125, 4)
     dirac.loadGauge(gauge)
     
-    # * add momentum phase to wall source
-    mom_phase = MomentumPhase(latt_info).getPhase([0, 0, 0])
-    wall_source = source.propagator(latt_info, "wall", 0, mom_phase)
+    wall_pion_DA_tmp = cp.zeros((len(t_src_list), len(z_list), latt_info.Lt), "<c16")
+    point_pion_DA_tmp = cp.zeros((len(t_src_list), len(z_list), latt_info.Lt), "<c16")
+        
+    for idt, t_src in enumerate(t_src_list):
+        # * add momentum phase to wall source
+        mom_phase = MomentumPhase(latt_info).getPhase([0, 0, 0])
+        wall_source = source.propagator(latt_info, "wall", t_src, mom_phase)
 
-    wall_propag = core.invertPropagator(dirac, wall_source)
+        wall_propag = core.invertPropagator(dirac, wall_source)
 
-    # wtzyxjiba are indices of the propagator, ->t means contract all indices except t
-    # [0, -1, -1, -1] means keep the t direction and sum over the other directions, 1 means gather the data, 0 means no action, -1 means sum / average
-    wall_propag_shift = wall_propag.copy()
-    for z in z_list:
-        wall_pion_DA[cfg, z] = contract(
-            "wtzyxjiba,jk,wtzyxklba,li->t",
-            wall_propag.data.conj(),
-            G5 @ G4G5,
-            wall_propag_shift.data,
-            G5 @ G5
-        )
-        for spin in range(4):
-            for color in range(3):
-                fermion = wall_propag_shift.getFermion(spin, color)
-                fermion_shift = gauge.pure_gauge.covDev(fermion, 2)
-                # \psi'(x)=U_\mu(x)\psi(x+\hat\mu) 0,1,2,3 for x,y,z,t; 4,5,6,7 for -x,-y,-z,-t
-                wall_propag_shift.setFermion(fermion_shift, spin, color)
+        # wtzyxjiba are indices of the propagator, ->t means contract all indices except t
+        # [0, -1, -1, -1] means keep the t direction and sum over the other directions, 1 means gather the data, 0 means no action, -1 means sum / average
+        wall_propag_shift = wall_propag.copy()
+        for idz, z in enumerate(z_list):
+            wall_pion_DA_tmp[idt, idz] += contract(
+                "wtzyxjiba,jk,wtzyxklba,li->t",
+                wall_propag.data.conj(),
+                G5 @ G4G5,
+                wall_propag_shift.data,
+                G5 @ G5
+            )
+            for spin in range(4):
+                for color in range(3):
+                    fermion = wall_propag_shift.getFermion(spin, color)
+                    fermion_shift = gauge.pure_gauge.covDev(fermion, 2)
+                    # \psi'(x)=U_\mu(x)\psi(x+\hat\mu) 0,1,2,3 for x,y,z,t; 4,5,6,7 for -x,-y,-z,-t
+                    wall_propag_shift.setFermion(fermion_shift, spin, color)
 
-    point_source = source.propagator(latt_info, "point", [0, 0, 0, 0])
-    point_propag = core.invertPropagator(dirac, point_source)
-    
-    point_propag_shift = point_propag.copy()
-    for z in z_list:
-        point_pion_DA[cfg, z] = contract(
-            "wtzyxjiba,jk,wtzyxklba,li->t",
-            point_propag.data.conj(),
-            G5 @ G4G5,
-            point_propag_shift.data,
-            G5 @ G5
-        )
-        for spin in range(4):
-            for color in range(3):
-                #! if CG, no Wilson link
-                fermion = point_propag_shift.getFermion(spin, color)
-                unit = LatticeGauge(latt_info)
-                unit.gauge_dirac.loadGauge(gauge)
-                fermion_unit = unit.pure_gauge.covDev(fermion, 2)
-                point_propag_shift.setFermion(fermion_unit, spin, color)
-                
+        point_source = source.propagator(latt_info, "point", [0, 0, 0, t_src])
+        point_propag = core.invertPropagator(dirac, point_source)
+        
+        point_propag_shift = point_propag.copy()
+        for idz, z in enumerate(z_list):
+            point_pion_DA_tmp[idt, idz] += contract(
+                "wtzyxjiba,jk,wtzyxklba,li->t",
+                point_propag.data.conj(),
+                G5 @ G4G5,
+                point_propag_shift.data,
+                G5 @ G5
+            )
+            for spin in range(4):
+                for color in range(3):
+                    #! if CG, no Wilson link
+                    fermion = point_propag_shift.getFermion(spin, color)
+                    unit = LatticeGauge(latt_info)
+                    unit.gauge_dirac.loadGauge(gauge)
+                    fermion_unit = unit.pure_gauge.covDev(fermion, 2)
+                    point_propag_shift.setFermion(fermion_unit, spin, color)
+                    
 
     gauge.pure_gauge.freeGauge()
 
-wall_pion_DA = core.gatherLattice(wall_pion_DA.real.get(), [1, -1, -1, -1])
-point_pion_DA = core.gatherLattice(point_pion_DA.real.get(), [1, -1, -1, -1])
+    wall_pion_DA_tmp = core.gatherLattice(wall_pion_DA_tmp.real.get(), [1, -1, -1, -1])
+    point_pion_DA_tmp = core.gatherLattice(point_pion_DA_tmp.real.get(), [1, -1, -1, -1])
+    
+    if latt_info.mpi_rank == 0:
+        for idt, t_src in enumerate(t_src_list):
+            wall_pion_DA_tmp[idt] = np.roll(wall_pion_DA_tmp[idt], -t_src, 0)
+            point_pion_DA_tmp[idt] = np.roll(point_pion_DA_tmp[idt], -t_src, 0)
+        
+        wall_pion_DA.append(np.mean(wall_pion_DA_tmp, axis=0))
+        point_pion_DA.append(np.mean(point_pion_DA_tmp, axis=0))
+
+# average over t_src
+wall_pion_DA = np.array(wall_pion_DA)
+point_pion_DA = np.array(point_pion_DA)
 
 print(np.shape(wall_pion_DA))
 print(np.shape(point_pion_DA))
