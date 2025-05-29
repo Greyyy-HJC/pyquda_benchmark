@@ -18,6 +18,8 @@ if not os.path.exists(".cache"):
     print("Created .cache directory for PyQUDA resources")
 
 init([1, 1, 1, 1], resource_path=".cache")
+Ls = 8
+Lt = 32
 N_conf = 20
 
 xi_0, nu = 1.0, 1.0
@@ -34,7 +36,7 @@ G5 = gamma.gamma(15)
 
 latt_info = core.LatticeInfo([8, 8, 8, 32], -1, xi_0 / nu)
 dirac = core.getClover(latt_info, mass, 1e-8, 10000, xi_0, csw_r, csw_t, multigrid)
-t_src_list = list(range(0, latt_info.Lt, int(latt_info.Lt/4)))
+t_src_list = list(range(0, Lt, int(Lt/4)))
 z_list = list(range(8))
 
 wall_pion_DA = []
@@ -57,13 +59,19 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
         # wtzyxjiba are indices of the propagator, ->t means contract all indices except t
         # [0, -1, -1, -1] means keep the t direction and sum over the other directions, 1 means gather the data, 0 means no action, -1 means sum / average
         wall_propag_shift = wall_propag.copy()
+        wall_propag_backward = contract("li,wtzyxjiba,jk->wtzyxklba", G5 @ G5, wall_propag.data.conj(), G5 @ G4G5)
         for idz, z in enumerate(z_list):
+            # wall_pion_DA_tmp[idt, idz] += contract(
+            #     "wtzyxjiba,jk,wtzyxklba,li->t",
+            #     wall_propag.data.conj(),
+            #     G5 @ G4G5,
+            #     wall_propag_shift.data,
+            #     G5 @ G5
+            # )
             wall_pion_DA_tmp[idt, idz] += contract(
-                "wtzyxjiba,jk,wtzyxklba,li->t",
-                wall_propag.data.conj(),
-                G5 @ G4G5,
-                wall_propag_shift.data,
-                G5 @ G5
+                "wtzyxklba,wtzyxklba->t",
+                wall_propag_backward,
+                wall_propag_shift.data
             )
             for spin in range(4):
                 for color in range(3):
@@ -84,14 +92,17 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
                 point_propag_shift.data,
                 G5 @ G5
             )
+            
+            unit = LatticeGauge(latt_info)
+            unit.gauge_dirac.loadGauge(unit)
             for spin in range(4):
                 for color in range(3):
                     #! if CG, no Wilson link
                     fermion = point_propag_shift.getFermion(spin, color)
-                    unit = LatticeGauge(latt_info)
-                    unit.gauge_dirac.loadGauge(gauge)
                     fermion_unit = unit.pure_gauge.covDev(fermion, 2)
                     point_propag_shift.setFermion(fermion_unit, spin, color)
+            
+            unit.gauge_dirac.loadGauge(gauge)
                     
 
     gauge.pure_gauge.freeGauge()
@@ -139,7 +150,7 @@ plt.show()
 fix_t = 10
 bare_da = []
 for z in z_list:
-    bare_da.append(point_pion_jk_avg[z][fix_t])
+    bare_da.append(wall_pion_jk_avg[z][fix_t])
 bare_da = np.array(bare_da)
 bare_da = bare_da / bare_da[0]
 
