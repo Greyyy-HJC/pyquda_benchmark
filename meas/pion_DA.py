@@ -1,5 +1,6 @@
 # %%
 import os
+import time
 import gvar as gv
 import cupy as cp
 from tqdm.auto import tqdm
@@ -13,14 +14,16 @@ from lametlat.utils.plot_settings import *
 from lametlat.utils.resampling import *
 from lametlat.preprocess.read_raw import pt2_to_meff
 
+os.environ["CUPY_ACCELERATORS"] = "cub,cutensor"
+
 if not os.path.exists(".cache"):
     os.makedirs(".cache")
     print("Created .cache directory for PyQUDA resources")
 
-init([1, 1, 1, 1], resource_path=".cache")
+init(None, [8, 8, 8, 32], resource_path=".cache")
 Ls = 8
 Lt = 32
-N_conf = 20
+N_conf = 10
 
 xi_0, nu = 1.0, 1.0
 mass = -0.038888 # kappa = 0.12623
@@ -36,7 +39,7 @@ G5 = gamma.gamma(15)
 
 latt_info = core.LatticeInfo([8, 8, 8, 32], -1, xi_0 / nu)
 dirac = core.getClover(latt_info, mass, 1e-8, 10000, xi_0, csw_r, csw_t, multigrid)
-t_src_list = list(range(0, Lt, int(Lt/4)))
+t_src_list = list(range(0, Lt, int(Lt)))
 z_list = list(range(8))
 
 wall_pion_DA = []
@@ -61,6 +64,10 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
         wall_propag_shift = wall_propag.copy()
         wall_propag_backward = contract("li,wtzyxjiba,jk->wtzyxklba", G5 @ G5, wall_propag.data.conj(), G5 @ G4G5)
         for idz, z in enumerate(z_list):
+            # Time the contraction
+            cp.cuda.runtime.deviceSynchronize()
+            start_contract = time.time()
+            
             # wall_pion_DA_tmp[idt, idz] += contract(
             #     "wtzyxjiba,jk,wtzyxklba,li->t",
             #     wall_propag.data.conj(),
@@ -73,12 +80,23 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
                 wall_propag_backward,
                 wall_propag_shift.data
             )
+            
+            cp.cuda.runtime.deviceSynchronize()
+            end_contract = time.time()
+            print(f">>> Contraction type 1 time: {end_contract - start_contract:.3f} seconds")
+            
+            # Time the shift operation
+            cp.cuda.runtime.deviceSynchronize()
+            start_shift = time.time()
             for spin in range(4):
                 for color in range(3):
                     fermion = wall_propag_shift.getFermion(spin, color)
                     fermion_shift = gauge.pure_gauge.covDev(fermion, 2)
                     # \psi'(x)=U_\mu(x)\psi(x+\hat\mu) 0,1,2,3 for x,y,z,t; 4,5,6,7 for -x,-y,-z,-t
                     wall_propag_shift.setFermion(fermion_shift, spin, color)
+            cp.cuda.runtime.deviceSynchronize()
+            end_shift = time.time()
+            print(f">>> Shift time: {end_shift - start_shift:.3f} seconds")
 
         point_source = source.propagator(latt_info, "point", [0, 0, 0, t_src])
         point_propag = core.invertPropagator(dirac, point_source)
@@ -93,16 +111,26 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
                 G5 @ G5
             )
             
-            unit = LatticeGauge(latt_info)
-            unit.gauge_dirac.loadGauge(unit)
+            # unit = LatticeGauge(latt_info)
+            # unit.gauge_dirac.loadGauge(unit)
+            # for spin in range(4):
+            #     for color in range(3):
+            #         #! if CG, no Wilson link
+            #         fermion = point_propag_shift.getFermion(spin, color)
+            #         fermion_unit = unit.pure_gauge.covDev(fermion, 2)
+            #         point_propag_shift.setFermion(fermion_unit, spin, color)
+            
+            # unit.gauge_dirac.loadGauge(gauge)
+            
+            
+            # use cupy.roll to shift each fermion's data
             for spin in range(4):
                 for color in range(3):
-                    #! if CG, no Wilson link
                     fermion = point_propag_shift.getFermion(spin, color)
-                    fermion_unit = unit.pure_gauge.covDev(fermion, 2)
-                    point_propag_shift.setFermion(fermion_unit, spin, color)
-            
-            unit.gauge_dirac.loadGauge(gauge)
+                    # shift z direction (axis=2) forward 1 grid
+                    shifted_data = cp.roll(fermion.data, shift=-1, axis=2)
+                    fermion.data[...] = shifted_data
+                    point_propag_shift.setFermion(fermion, spin, color)
                     
 
     gauge.pure_gauge.freeGauge()
@@ -133,7 +161,7 @@ wall_pion_jk_avg = jk_ls_avg(wall_pion_jk)
 point_pion_jk_avg = jk_ls_avg(point_pion_jk)
 
 fig, ax = default_plot()
-for idx, z in enumerate(z_list):
+for idx, z in enumerate(z_list[:1]):
     wall_meff = pt2_to_meff(wall_pion_jk_avg[idx], boundary="periodic")
     point_meff = pt2_to_meff(point_pion_jk_avg[idx], boundary="periodic")
     ax.errorbar(np.arange(len(wall_meff)), gv.mean(wall_meff), yerr=gv.sdev(wall_meff), label=f"wall, z={z}", **errorb)
@@ -153,6 +181,8 @@ for z in z_list:
     bare_da.append(wall_pion_jk_avg[z][fix_t])
 bare_da = np.array(bare_da)
 bare_da = bare_da / bare_da[0]
+
+print(bare_da)
 
 fig, ax = default_plot()
 ax.errorbar(z_list, gv.mean(bare_da), yerr=gv.sdev(bare_da), label="point", **errorb)
