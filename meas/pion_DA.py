@@ -45,7 +45,8 @@ z_list = list(range(8))
 wall_pion_DA = []
 point_pion_DA = []
 for cfg in tqdm(range(N_conf), desc="Processing configurations"):
-    gauge = io.readNERSCGauge(f"../conf/S8T32/wilson_b6.{cfg}")
+    # gauge = io.readNERSCGauge(f"../conf/S8T32/wilson_b6.{cfg}")
+    gauge = io.readNERSCGauge(f"/home/jinchen/git/lat-software/gpt_benchmark/conf/S8T32_cg/gauge/wilson_b6.cg.1e-08.{cfg}")
     # gauge.stoutSmear(1, 0.125, 4)
     dirac.loadGauge(gauge)
     
@@ -101,7 +102,7 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
         point_source = source.propagator(latt_info, "point", [0, 0, 0, t_src])
         point_propag = core.invertPropagator(dirac, point_source)
         
-        point_propag_shift = point_propag.copy()
+        point_propag_shift = point_propag.copy() # (2, Lt, Lz, Ly, Lx // 2, Ns, Ns Nc, Nc)
         for idz, z in enumerate(z_list):
             point_pion_DA_tmp[idt, idz] += contract(
                 "wtzyxjiba,jk,wtzyxklba,li->t",
@@ -111,27 +112,17 @@ for cfg in tqdm(range(N_conf), desc="Processing configurations"):
                 G5 @ G5
             )
             
-            # unit = LatticeGauge(latt_info)
-            # unit.gauge_dirac.loadGauge(unit)
-            # for spin in range(4):
-            #     for color in range(3):
-            #         #! if CG, no Wilson link
-            #         fermion = point_propag_shift.getFermion(spin, color)
-            #         fermion_unit = unit.pure_gauge.covDev(fermion, 2)
-            #         point_propag_shift.setFermion(fermion_unit, spin, color)
-            
-            # unit.gauge_dirac.loadGauge(gauge)
-            
-            
-            # use cupy.roll to shift each fermion's data
+            #! use covDev to shift fermion's data
+            unit = LatticeGauge(latt_info)
+            unit.gauge_dirac.loadGauge(unit)
             for spin in range(4):
                 for color in range(3):
+                    #! if CG, no Wilson link
                     fermion = point_propag_shift.getFermion(spin, color)
-                    # shift z direction (axis=2) forward 1 grid
-                    shifted_data = cp.roll(fermion.data, shift=-1, axis=2)
-                    fermion.data[...] = shifted_data
-                    point_propag_shift.setFermion(fermion, spin, color)
-                    
+                    fermion_unit = unit.pure_gauge.covDev(fermion, 2)
+                    point_propag_shift.setFermion(fermion_unit, spin, color)
+            
+            unit.gauge_dirac.loadGauge(gauge)
 
     gauge.pure_gauge.freeGauge()
 
@@ -176,20 +167,26 @@ plt.show()
 
 # %%
 fix_t = 10
-bare_da = []
+bare_point_da = []
 for z in z_list:
-    bare_da.append(wall_pion_jk_avg[z][fix_t])
-bare_da = np.array(bare_da)
-bare_da = bare_da / bare_da[0]
+    bare_point_da.append(point_pion_jk_avg[z][fix_t])
+bare_point_da = np.array(bare_point_da)
+bare_point_da = bare_point_da / bare_point_da[0]
+
+bare_wall_da = []
+for z in z_list:
+    bare_wall_da.append(wall_pion_jk_avg[z][fix_t])
+bare_wall_da = np.array(bare_wall_da)
+bare_wall_da = bare_wall_da / bare_wall_da[0]
 
 fig, ax = default_plot()
-ax.errorbar(z_list, gv.mean(bare_da), yerr=gv.sdev(bare_da), label="point", **errorb)
+ax.errorbar(z_list, gv.mean(bare_point_da), yerr=gv.sdev(bare_point_da), label="point", **errorb)
+ax.errorbar(z_list, gv.mean(bare_wall_da), yerr=gv.sdev(bare_wall_da), label="wall", **errorb)
 ax.legend(**fs_small_p)
 ax.set_xlabel(r"$z$", **fs_p)
 ax.set_ylabel(r"$h^0(z)$", **fs_p)
 plt.tight_layout()
 plt.savefig("../output/plots/pion_DA_bare.pdf", transparent=True)
 plt.show()
-
 
 # %%
