@@ -182,8 +182,6 @@ for z in z_list:
 bare_da = np.array(bare_da)
 bare_da = bare_da / bare_da[0]
 
-print(bare_da)
-
 fig, ax = default_plot()
 ax.errorbar(z_list, gv.mean(bare_da), yerr=gv.sdev(bare_da), label="point", **errorb)
 ax.legend(**fs_small_p)
