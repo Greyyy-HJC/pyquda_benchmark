@@ -1,0 +1,1518 @@
+
+>>> SLURM_JOB_NODELIST content:
+lq2gpu07
+1n*4t
+
+
+>>> Start time: Mon Jun 23 20:37:32 CDT 2025
+Python 3.8.12
+/lustre1/pion3d/package/gpt/lib/cgpt/build:/lustre1/pion3d/package/gpt/lib/cgpt/build/../..:/lustre1/pion3d/jinchen/run/qTMD_softFF/gpt_utils:/lustre1/pion3d/jinchen/run/qTMD_softFF/gpt_utils/utils:/lustre1/pion3d/jinchen/run/qTMD_softFF/gpt_utils/qTMD
+
+>>> Check nvcc:
+/srv/software/el8/x86_64/hpc/cuda/12.2.1/bin/nvcc
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2023 NVIDIA Corporation
+Built on Tue_Jul_11_02:20:44_PDT_2023
+Cuda compilation tools, release 12.2, V12.2.128
+Build cuda_12.2.r12.2/compiler.33053471_0
+
+>>> Show GPU info:
+Mon Jun 23 20:37:34 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 565.57.01              Driver Version: 565.57.01      CUDA Version: 12.7     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100-SXM4-80GB          On  |   00000000:2F:00.0 Off |                    0 |
+| N/A   35C    P0             64W /  400W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A100-SXM4-80GB          On  |   00000000:30:00.0 Off |                    0 |
+| N/A   29C    P0             63W /  400W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A100-SXM4-80GB          On  |   00000000:AF:00.0 Off |                    0 |
+| N/A   29C    P0             61W /  400W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A100-SXM4-80GB          On  |   00000000:B0:00.0 Off |                    0 |
+| N/A   37C    P0             62W /  400W |       1MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+>>> Output LD_LIBRARY_PATH:
+/srv/software/el8/x86_64/eb/GDRCopy/2.3.1/lib:/srv/software/el8/x86_64/hpc/cuda/12.2.1/targets/x86_64-linux/lib:/srv/software/el8/x86_64/hpc/cuda/12.2.1/lib64:/srv/software/el8/x86_64/eb/FFTW/3.3.10-GCC-12.3.0/lib:/srv/software/el8/x86_64/eb/binutils/2.40-GCCcore-12.3.0/lib:/srv/software/el8/x86_64/eb/GCCcore/12.3.0/lib64:/srv/software/el8/x86_64/eb/LAPACK/3.11.0-GCC-12.3.0/lib:/srv/software/el8/x86_64/eb/OpenMPI/4.1.5-GCC-12.3.0/lib:/srv/software/el8/x86_64/eb/UCC/1.2.0/lib:/srv/software/el8/x86_64/eb/PMIx/4.2.6/lib:/srv/software/el8/x86_64/eb/UCX/1.14.1/lib:/srv/software/el8/x86_64/eb/libevent/2.1.12/lib:/srv/software/el8/x86_64/eb/hwloc/2.9.2/lib:/srv/software/el8/x86_64/eb/libpciaccess/0.17/lib:/srv/software/el8/x86_64/eb/libxml2/2.11.4/lib:/srv/software/el8/x86_64/eb/XZ/5.4.2/lib:/srv/software/el8/x86_64/eb/numactl/2.0.16/lib:/srv/software/el8/x86_64/eb/zlib/1.2.13/lib
+
+>>> Run Python script pion_DA.py
+SLURM detected
+AcceleratorCudaInit[0]: ========================
+AcceleratorCudaInit[0]: Device Number    : 0
+AcceleratorCudaInit[0]: ========================
+AcceleratorCudaInit[0]: Device identifier: NVIDIA A100-SXM4-80GB
+AcceleratorCudaInit[0]:   totalGlobalMem: 85097971712 
+AcceleratorCudaInit[0]:   managedMemory: 1 
+AcceleratorCudaInit[0]:   isMultiGpuBoard: 0 
+AcceleratorCudaInit[0]:   warpSize: 32 
+AcceleratorCudaInit[0]:   pciBusID: 47 
+AcceleratorCudaInit[0]:   pciDeviceID: 0 
+AcceleratorCudaInit[0]: maxGridSize (2147483647,65535,65535)
+AcceleratorCudaInit: using default device 
+AcceleratorCudaInit: assume user either uses
+AcceleratorCudaInit: a) IBM jsrun, or 
+AcceleratorCudaInit: b) invokes through a wrapping script to set CUDA_VISIBLE_DEVICES, UCX_NET_DEVICES, and numa binding 
+AcceleratorCudaInit: Configure options --enable-setdevice=no 
+local rank 0 device 0 bus id: 0000:2F:00.0
+AcceleratorCudaInit: ================================================
+local rank 1 device 0 bus id: 0000:30:00.0
+local rank 2 device 0 bus id: 0000:AF:00.0
+local rank 3 device 0 bus id: 0000:B0:00.0
+SharedMemoryMpi:  World communicator of size 4
+SharedMemoryMpi:  Node  communicator of size 1
+0SharedMemoryMpi:  SharedMemoryMPI.cc acceleratorAllocDevice 2147483648bytes at 0x7f1e80000000 - 7f1effffffff for comms buffers 
+Setting up IPC
+
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+__|_ |  |  |  |  |  |  |  |  |  |  |  | _|__
+__|_                                    _|__
+__|_   GGGG    RRRR    III    DDDD      _|__
+__|_  G        R   R    I     D   D     _|__
+__|_  G        R   R    I     D    D    _|__
+__|_  G  GG    RRRR     I     D    D    _|__
+__|_  G   G    R  R     I     D   D     _|__
+__|_   GGGG    R   R   III    DDDD      _|__
+__|_                                    _|__
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+__|__|__|__|__|__|__|__|__|__|__|__|__|__|__
+  |  |  |  |  |  |  |  |  |  |  |  |  |  |  
+
+
+Copyright (C) 2015 Peter Boyle, Azusa Yamaguchi, Guido Cossu, Antonin Portelli and other authors
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+Current Grid git commit hash=46c717e873bb91677e8961a6fc5bfc58bc2171a5: (HEAD -> gpt_proton, origin/gpt_proton) clean
+
+Grid : Message : ================================================ 
+Grid : Message : MPI is initialised and logging filters activated 
+Grid : Message : ================================================ 
+Grid : Message : This rank is running on host lq2gpu07.fnal.gov
+Grid : Message : Requested 2147483648 byte stencil comms buffers 
+Grid : Message : MemoryManager Cache 27262976000 bytes 
+Grid : Message : MemoryManager::Init() setting up
+Grid : Message : MemoryManager::Init() cache pool for recent host   allocations: SMALL 8 LARGE 2 HUGE 0
+Grid : Message : MemoryManager::Init() cache pool for recent device allocations: SMALL 16 LARGE 8 Huge 0
+Grid : Message : MemoryManager::Init() cache pool for recent shared allocations: SMALL 16 LARGE 8 Huge 0
+Grid : Message : MemoryManager::Init() Non unified: Caching accelerator data in dedicated memory
+Grid : Message : MemoryManager::Init() Using cudaMalloc
+
+=============================================
+              Initialized GPT                
+     Copyright (C) 2020 Christoph Lehner     
+=============================================
+PyQUDA INFO: Using the grid size [1, 1, 1, 4]
+PyQUDA INFO: Using CUDA backend cupy
+MPS enabled, rank=  1 -> gpu=0
+MPS enabled, rank=  2 -> gpu=0
+MPS enabled, rank=  3 -> gpu=0
+PyQUDA INFO: Using QUDA_RESOURCE_PATH=.cache
+PyQUDA INFO: Using QUDA_ENABLE_MPS=1
+PyQUDA INFO: Using QUDA_ENABLE_P2P=0
+PyQUDA INFO: Using QUDA_ENABLE_TUNING=1
+PyQUDA INFO: Using QUDA_ENABLE_DEVICE_MEMORY_POOL=0
+MPS enabled, rank=  1 -> gpu=0
+MPS enabled, rank=  2 -> gpu=0
+MPS enabled, rank=  3 -> gpu=0
+Disabling GPU-Direct RDMA access
+Disabling peer-to-peer access
+QUDA 1.1.0 (git 1.1.0-59e867488-sm_80)
+CUDA Driver version = 12070
+CUDA Runtime version = 12020
+Graphic driver version = 565.57.01
+Found device 0: NVIDIA A100-SXM4-80GB
+Using device 0: NVIDIA A100-SXM4-80GB
+Initializing monitoring on device 0: NVIDIA A100-SXM4-80GB
+WARNING: Data reordering done on GPU (set with QUDA_REORDER_LOCATION=GPU/CPU)
+Loaded 1582 sets of cached parameters from .cache/tunecache.tsv
+WARNING: Not using device memory pool allocator
+WARNING: Using pinned memory pool allocator
+cublasCreated successfully
+
+Processing configuration 1008 at 2025-06-23 20:37:50
+
+Processing configuration 1008 at 2025-06-23 20:37:50
+
+Processing configuration 1008 at 2025-06-23 20:37:50
+
+Processing configuration 1008 at 2025-06-23 20:37:50
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     130.906268 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1008.coulomb.1e-14
+GPT :     130.906354 s :    BEGIN_HEADER
+GPT :     130.906363 s : 	HDR_VERSION = 1.0
+GPT :     130.906376 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     130.906384 s : 	STORAGE_FORMAT = 1.0
+GPT :     130.906390 s : 	DIMENSION_1 = 48
+GPT :     130.906395 s : 	DIMENSION_2 = 48
+GPT :     130.906400 s : 	DIMENSION_3 = 48
+GPT :     130.906408 s : 	DIMENSION_4 = 64
+GPT :     130.906413 s : 	CHECKSUM = b8eea001
+GPT :     130.906418 s : 	LINK_TRACE = 0.671252726900731
+GPT :     130.906424 s : 	PLAQUETTE = 0.628370345017572
+GPT :     130.906430 s : 	BOUNDARY_1 = PERIODIC
+GPT :     130.906437 s : 	BOUNDARY_2 = PERIODIC
+GPT :     130.906442 s : 	BOUNDARY_3 = PERIODIC
+GPT :     130.906446 s : 	BOUNDARY_4 = PERIODIC
+GPT :     130.906451 s : 	ENSEMBLE_ID = ukqcd
+GPT :     130.906456 s : 	SEQUENCE_NUMBER = 1000
+GPT :     130.906462 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     130.906469 s : 	CREATOR_MACHINE = jinchen
+GPT :     130.906474 s : 	CREATION_DATE = Tue May 27 20:27:10 2025
+GPT :     130.906479 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     130.906484 s :    END_HEADER
+GPT :     133.235245 s : Read 3.79688 GB at 1.66628 GB/s (2.18488 GB/s for distribution, 7.02051 GB/s for munged read, 176.996 GB/s for checksum, 48.5098 GB/s for munging, 4 readers)
+Grid : Message : 130.974662 s :  Stencil object allocated for 442368 sites table 0x7f16d4200000 GridPtr 0x325bef10
+Grid : Message : 130.983793 s :  Stencil object allocated for 442368 sites table 0x7f1762000000 GridPtr 0x325bef10
+Grid : Message : 130.991521 s :  Stencil object allocated for 442368 sites table 0x7f1756000000 GridPtr 0x325bef10
+Grid : Message : 130.999478 s :  Stencil object allocated for 442368 sites table 0x7f174e000000 GridPtr 0x325bef10
+GCR: Convergence at 17 iterations, L2 relative residual: iterated = 5.547238e-11, true = 5.547238e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.033 secs, Performance = 3704.053 GFLOPS
+GCR: Convergence at 18 iterations, L2 relative residual: iterated = 5.253742e-11, true = 5.253742e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.831 secs, Performance = 4117.135 GFLOPS
+GCR: Convergence at 18 iterations, L2 relative residual: iterated = 6.416992e-11, true = 6.416992e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.120 secs, Performance = 3555.623 GFLOPS
+GCR: Convergence at 18 iterations, L2 relative residual: iterated = 4.110433e-11, true = 4.110433e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.320 secs, Performance = 3334.477 GFLOPS
+GCR: Convergence at 18 iterations, L2 relative residual: iterated = 7.648986e-11, true = 7.648986e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.925 secs, Performance = 3811.908 GFLOPS
+GCR: Convergence at 18 iterations, L2 relative residual: iterated = 4.693232e-11, true = 4.693232e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.969 secs, Performance = 3727.514 GFLOPS
+GCR: Convergence at 18 iterations, L2 relative residual: iterated = 7.401265e-11, true = 7.401265e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.968 secs, Performance = 3829.005 GFLOPS
+GCR: Convergence at 19 iterations, L2 relative residual: iterated = 4.598661e-11, true = 4.598661e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.060 secs, Performance = 3855.389 GFLOPS
+GCR: Convergence at 19 iterations, L2 relative residual: iterated = 4.038396e-11, true = 4.038396e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.082 secs, Performance = 3719.590 GFLOPS
+GCR: Convergence at 19 iterations, L2 relative residual: iterated = 4.343967e-11, true = 4.343967e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.007 secs, Performance = 3858.051 GFLOPS
+GCR: Convergence at 19 iterations, L2 relative residual: iterated = 3.814668e-11, true = 3.814668e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.991 secs, Performance = 3889.330 GFLOPS
+GCR: Convergence at 19 iterations, L2 relative residual: iterated = 4.199174e-11, true = 4.199174e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 2.123 secs, Performance = 3741.555 GFLOPS
+>>> Contraction time: 0.074 seconds
+>>> Contraction time: 0.074 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1014 at 2025-06-23 20:40:30
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1014 at 2025-06-23 20:40:32
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1014 at 2025-06-23 20:40:32
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1014 at 2025-06-23 20:40:32
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     227.950142 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1014.coulomb.1e-14
+GPT :     227.950196 s :    BEGIN_HEADER
+GPT :     227.950210 s : 	HDR_VERSION = 1.0
+GPT :     227.950219 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     227.950228 s : 	STORAGE_FORMAT = 1.0
+GPT :     227.950236 s : 	DIMENSION_1 = 48
+GPT :     227.950242 s : 	DIMENSION_2 = 48
+GPT :     227.950249 s : 	DIMENSION_3 = 48
+GPT :     227.950256 s : 	DIMENSION_4 = 64
+GPT :     227.950263 s : 	CHECKSUM = 8b87913
+GPT :     227.950267 s : 	LINK_TRACE = 0.669815697423165
+GPT :     227.950274 s : 	PLAQUETTE = 0.628398546532729
+GPT :     227.950280 s : 	BOUNDARY_1 = PERIODIC
+GPT :     227.950287 s : 	BOUNDARY_2 = PERIODIC
+GPT :     227.950294 s : 	BOUNDARY_3 = PERIODIC
+GPT :     227.950298 s : 	BOUNDARY_4 = PERIODIC
+GPT :     227.950304 s : 	ENSEMBLE_ID = ukqcd
+GPT :     227.950310 s : 	SEQUENCE_NUMBER = 1000
+GPT :     227.950316 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     227.950324 s : 	CREATOR_MACHINE = jinchen
+GPT :     227.950329 s : 	CREATION_DATE = Tue May 27 20:33:13 2025
+GPT :     227.950335 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     227.950340 s :    END_HEADER
+GPT :     230.185724 s : Read 3.79688 GB at 1.69893 GB/s (2.26069 GB/s for distribution, 6.83787 GB/s for munged read, 411.739 GB/s for checksum, 37.8662 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.106622e-11, true = 4.106622e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.677 secs, Performance = 3039.479 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.947939e-11, true = 2.947939e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.455 secs, Performance = 3504.070 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.448329e-11, true = 3.448329e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.519 secs, Performance = 3355.677 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.956153e-11, true = 2.956153e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.566 secs, Performance = 3255.196 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.819978e-11, true = 3.819978e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.395 secs, Performance = 3654.715 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.414709e-11, true = 4.414709e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.348 secs, Performance = 3781.853 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.335447e-11, true = 4.335447e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.351 secs, Performance = 3774.691 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.718753e-11, true = 4.718753e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.304 secs, Performance = 3911.453 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.445821e-11, true = 3.445821e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.300 secs, Performance = 3923.429 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.530457e-11, true = 4.530457e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.335 secs, Performance = 3818.169 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.201182e-11, true = 3.201182e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.313 secs, Performance = 3882.269 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.217119e-11, true = 3.217119e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.283 secs, Performance = 3973.622 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1020 at 2025-06-23 20:41:58
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1020 at 2025-06-23 20:42:01
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1020 at 2025-06-23 20:42:01
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1020 at 2025-06-23 20:42:01
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     311.761532 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1020.coulomb.1e-14
+GPT :     311.761589 s :    BEGIN_HEADER
+GPT :     311.761598 s : 	HDR_VERSION = 1.0
+GPT :     311.761610 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     311.761617 s : 	STORAGE_FORMAT = 1.0
+GPT :     311.761626 s : 	DIMENSION_1 = 48
+GPT :     311.761632 s : 	DIMENSION_2 = 48
+GPT :     311.761637 s : 	DIMENSION_3 = 48
+GPT :     311.761644 s : 	DIMENSION_4 = 64
+GPT :     311.761650 s : 	CHECKSUM = 1d95419d
+GPT :     311.761655 s : 	LINK_TRACE = 0.666187640177990
+GPT :     311.761660 s : 	PLAQUETTE = 0.628427567548758
+GPT :     311.761666 s : 	BOUNDARY_1 = PERIODIC
+GPT :     311.761672 s : 	BOUNDARY_2 = PERIODIC
+GPT :     311.761678 s : 	BOUNDARY_3 = PERIODIC
+GPT :     311.761683 s : 	BOUNDARY_4 = PERIODIC
+GPT :     311.761687 s : 	ENSEMBLE_ID = ukqcd
+GPT :     311.761692 s : 	SEQUENCE_NUMBER = 1000
+GPT :     311.761697 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     311.761703 s : 	CREATOR_MACHINE = jinchen
+GPT :     311.761708 s : 	CREATION_DATE = Tue May 27 20:39:30 2025
+GPT :     311.761713 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     311.761718 s :    END_HEADER
+GPT :     313.844108 s : Read 3.79688 GB at 1.82424 GB/s (2.43348 GB/s for distribution, 7.28695 GB/s for munged read, 306.762 GB/s for checksum, 32.4548 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 6.146673e-11, true = 6.146673e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.369 secs, Performance = 3724.276 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 8.362444e-11, true = 8.362444e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.325 secs, Performance = 3847.382 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.867051e-11, true = 5.867051e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.299 secs, Performance = 3925.749 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 6.287833e-11, true = 6.287833e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.392 secs, Performance = 3662.033 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 6.015045e-11, true = 6.015045e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.301 secs, Performance = 3918.213 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.020258e-11, true = 5.020258e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.206 secs, Performance = 4228.777 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.414877e-11, true = 5.414877e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.274 secs, Performance = 4003.091 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 8.183231e-11, true = 8.183231e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.327 secs, Performance = 3841.902 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.274097e-11, true = 5.274097e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.312 secs, Performance = 3885.239 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.623883e-11, true = 5.623883e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.263 secs, Performance = 4035.405 GFLOPS
+GCR: Convergence at 11 iterations, L2 relative residual: iterated = 8.782328e-11, true = 8.782328e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.210 secs, Performance = 4041.271 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 8.810645e-11, true = 8.810645e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.275 secs, Performance = 3999.515 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1026 at 2025-06-23 20:43:21
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.010 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1026 at 2025-06-23 20:43:23
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1026 at 2025-06-23 20:43:23
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1026 at 2025-06-23 20:43:23
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     397.837425 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1026.coulomb.1e-14
+GPT :     397.837485 s :    BEGIN_HEADER
+GPT :     397.837493 s : 	HDR_VERSION = 1.0
+GPT :     397.837507 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     397.837513 s : 	STORAGE_FORMAT = 1.0
+GPT :     397.837519 s : 	DIMENSION_1 = 48
+GPT :     397.837525 s : 	DIMENSION_2 = 48
+GPT :     397.837532 s : 	DIMENSION_3 = 48
+GPT :     397.837538 s : 	DIMENSION_4 = 64
+GPT :     397.837544 s : 	CHECKSUM = 22439fd6
+GPT :     397.837550 s : 	LINK_TRACE = 0.673292860145757
+GPT :     397.837555 s : 	PLAQUETTE = 0.628358692991581
+GPT :     397.837561 s : 	BOUNDARY_1 = PERIODIC
+GPT :     397.837568 s : 	BOUNDARY_2 = PERIODIC
+GPT :     397.837574 s : 	BOUNDARY_3 = PERIODIC
+GPT :     397.837579 s : 	BOUNDARY_4 = PERIODIC
+GPT :     397.837584 s : 	ENSEMBLE_ID = ukqcd
+GPT :     397.837589 s : 	SEQUENCE_NUMBER = 1000
+GPT :     397.837594 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     397.837600 s : 	CREATOR_MACHINE = jinchen
+GPT :     397.837606 s : 	CREATION_DATE = Tue May 27 20:46:09 2025
+GPT :     397.837611 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     397.837616 s :    END_HEADER
+GPT :     400.009259 s : Read 3.79688 GB at 1.74942 GB/s (2.21475 GB/s for distribution, 8.32748 GB/s for munged read, 79.0853 GB/s for checksum, 28.8606 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.275393e-11, true = 2.275393e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.654 secs, Performance = 3203.233 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.240754e-11, true = 3.240754e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.645 secs, Performance = 3220.777 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.317245e-11, true = 3.317245e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.516 secs, Performance = 3493.270 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.969394e-11, true = 2.969394e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.431 secs, Performance = 3700.559 GFLOPS
+GCR: Convergence at 11 iterations, L2 relative residual: iterated = 8.856730e-11, true = 8.856730e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.374 secs, Performance = 3559.321 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 8.195003e-11, true = 8.195003e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.422 secs, Performance = 3585.475 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.823560e-11, true = 2.823560e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.587 secs, Performance = 3337.439 GFLOPS
+GCR: Convergence at 11 iterations, L2 relative residual: iterated = 7.404675e-11, true = 7.404675e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.428 secs, Performance = 3564.574 GFLOPS
+GCR: Convergence at 11 iterations, L2 relative residual: iterated = 9.416810e-11, true = 9.416810e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.310 secs, Performance = 3733.821 GFLOPS
+GCR: Convergence at 11 iterations, L2 relative residual: iterated = 9.650044e-11, true = 9.650044e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.446 secs, Performance = 3383.313 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.497802e-11, true = 2.497802e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.423 secs, Performance = 3721.589 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.369674e-11, true = 3.369674e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.746 secs, Performance = 3033.189 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1032 at 2025-06-23 20:44:49
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1032 at 2025-06-23 20:44:52
+
+Processing configuration 1032 at 2025-06-23 20:44:52
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1032 at 2025-06-23 20:44:52
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     480.584692 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1032.coulomb.1e-14
+GPT :     480.584749 s :    BEGIN_HEADER
+GPT :     480.584759 s : 	HDR_VERSION = 1.0
+GPT :     480.584768 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     480.584778 s : 	STORAGE_FORMAT = 1.0
+GPT :     480.584787 s : 	DIMENSION_1 = 48
+GPT :     480.584793 s : 	DIMENSION_2 = 48
+GPT :     480.584800 s : 	DIMENSION_3 = 48
+GPT :     480.584806 s : 	DIMENSION_4 = 64
+GPT :     480.584813 s : 	CHECKSUM = 95639545
+GPT :     480.584819 s : 	LINK_TRACE = 0.667615518763224
+GPT :     480.584826 s : 	PLAQUETTE = 0.628317138608599
+GPT :     480.584833 s : 	BOUNDARY_1 = PERIODIC
+GPT :     480.584840 s : 	BOUNDARY_2 = PERIODIC
+GPT :     480.584846 s : 	BOUNDARY_3 = PERIODIC
+GPT :     480.584852 s : 	BOUNDARY_4 = PERIODIC
+GPT :     480.584858 s : 	ENSEMBLE_ID = ukqcd
+GPT :     480.584864 s : 	SEQUENCE_NUMBER = 1000
+GPT :     480.584870 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     480.584877 s : 	CREATOR_MACHINE = jinchen
+GPT :     480.584884 s : 	CREATION_DATE = Tue May 27 20:52:22 2025
+GPT :     480.584891 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     480.584898 s :    END_HEADER
+GPT :     482.718994 s : Read 3.79688 GB at 1.7803 GB/s (2.28569 GB/s for distribution, 8.05211 GB/s for munged read, 180.464 GB/s for checksum, 23.7348 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.891435e-11, true = 3.891435e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.493 secs, Performance = 3548.226 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.133160e-11, true = 3.133160e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.447 secs, Performance = 3659.916 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.323151e-11, true = 3.323151e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.476 secs, Performance = 3589.863 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.576429e-11, true = 3.576429e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.484 secs, Performance = 3569.300 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.928510e-11, true = 3.928510e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.530 secs, Performance = 3461.551 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 1.736296e-11, true = 1.736296e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.763 secs, Performance = 3116.689 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.897764e-11, true = 2.897764e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.311 secs, Performance = 4040.133 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.410565e-11, true = 2.410565e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.557 secs, Performance = 3401.347 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.693761e-11, true = 2.693761e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.654 secs, Performance = 3202.826 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.977503e-11, true = 2.977503e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.453 secs, Performance = 3645.627 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.253082e-11, true = 3.253082e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.337 secs, Performance = 3963.190 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.432218e-11, true = 2.432218e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.592 secs, Performance = 3327.176 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1038 at 2025-06-23 20:46:12
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1038 at 2025-06-23 20:46:15
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1038 at 2025-06-23 20:46:15
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1038 at 2025-06-23 20:46:15
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     569.758403 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1038.coulomb.1e-14
+GPT :     569.758461 s :    BEGIN_HEADER
+GPT :     569.758470 s : 	HDR_VERSION = 1.0
+GPT :     569.758483 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     569.758492 s : 	STORAGE_FORMAT = 1.0
+GPT :     569.758499 s : 	DIMENSION_1 = 48
+GPT :     569.758505 s : 	DIMENSION_2 = 48
+GPT :     569.758510 s : 	DIMENSION_3 = 48
+GPT :     569.758517 s : 	DIMENSION_4 = 64
+GPT :     569.758523 s : 	CHECKSUM = ff6f704f
+GPT :     569.758529 s : 	LINK_TRACE = 0.665372639063359
+GPT :     569.758535 s : 	PLAQUETTE = 0.628405791147111
+GPT :     569.758541 s : 	BOUNDARY_1 = PERIODIC
+GPT :     569.758547 s : 	BOUNDARY_2 = PERIODIC
+GPT :     569.758553 s : 	BOUNDARY_3 = PERIODIC
+GPT :     569.758559 s : 	BOUNDARY_4 = PERIODIC
+GPT :     569.758565 s : 	ENSEMBLE_ID = ukqcd
+GPT :     569.758571 s : 	SEQUENCE_NUMBER = 1000
+GPT :     569.758577 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     569.758586 s : 	CREATOR_MACHINE = jinchen
+GPT :     569.758593 s : 	CREATION_DATE = Tue May 27 20:58:13 2025
+GPT :     569.758599 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     569.758605 s :    END_HEADER
+GPT :     571.910798 s : Read 3.79688 GB at 1.76535 GB/s (2.32225 GB/s for distribution, 7.36173 GB/s for munged read, 324.04 GB/s for checksum, 42.7771 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.569578e-11, true = 2.569578e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.644 secs, Performance = 3342.435 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.533270e-11, true = 3.533270e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.604 secs, Performance = 3303.256 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 1.657709e-11, true = 1.657709e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.857 secs, Performance = 2964.541 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.141538e-11, true = 4.141538e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.784 secs, Performance = 2968.762 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.124604e-11, true = 5.124604e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.652 secs, Performance = 3207.172 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.988726e-11, true = 3.988726e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.473 secs, Performance = 3596.873 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.823937e-11, true = 3.823937e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.651 secs, Performance = 3208.596 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.105159e-11, true = 2.105159e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.656 secs, Performance = 3319.398 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.760547e-11, true = 5.760547e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.698 secs, Performance = 3119.657 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.944039e-11, true = 4.944039e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.499 secs, Performance = 3534.057 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.887798e-11, true = 3.887798e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.685 secs, Performance = 3143.721 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.211910e-11, true = 4.211910e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.564 secs, Performance = 3386.463 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.071 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1044 at 2025-06-23 20:47:43
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1044 at 2025-06-23 20:47:46
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1044 at 2025-06-23 20:47:46
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1044 at 2025-06-23 20:47:46
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     666.901993 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1044.coulomb.1e-14
+GPT :     666.902053 s :    BEGIN_HEADER
+GPT :     666.902063 s : 	HDR_VERSION = 1.0
+GPT :     666.902076 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     666.902083 s : 	STORAGE_FORMAT = 1.0
+GPT :     666.902089 s : 	DIMENSION_1 = 48
+GPT :     666.902096 s : 	DIMENSION_2 = 48
+GPT :     666.902102 s : 	DIMENSION_3 = 48
+GPT :     666.902108 s : 	DIMENSION_4 = 64
+GPT :     666.902113 s : 	CHECKSUM = d365eeaa
+GPT :     666.902118 s : 	LINK_TRACE = 0.667428342303299
+GPT :     666.902123 s : 	PLAQUETTE = 0.628351040876495
+GPT :     666.902128 s : 	BOUNDARY_1 = PERIODIC
+GPT :     666.902134 s : 	BOUNDARY_2 = PERIODIC
+GPT :     666.902139 s : 	BOUNDARY_3 = PERIODIC
+GPT :     666.902143 s : 	BOUNDARY_4 = PERIODIC
+GPT :     666.902148 s : 	ENSEMBLE_ID = ukqcd
+GPT :     666.902152 s : 	SEQUENCE_NUMBER = 1000
+GPT :     666.902157 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     666.902164 s : 	CREATOR_MACHINE = jinchen
+GPT :     666.902168 s : 	CREATION_DATE = Tue May 27 21:04:16 2025
+GPT :     666.902173 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     666.902178 s :    END_HEADER
+GPT :     668.990402 s : Read 3.79688 GB at 1.81933 GB/s (2.34704 GB/s for distribution, 8.09572 GB/s for munged read, 113.836 GB/s for checksum, 28.6818 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.015327e-11, true = 3.015327e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.505 secs, Performance = 3652.839 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.382276e-11, true = 2.382276e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.541 secs, Performance = 3566.163 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 1.985998e-11, true = 1.985998e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.508 secs, Performance = 3645.473 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.873480e-11, true = 2.873480e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.559 secs, Performance = 3524.548 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.403081e-11, true = 2.403081e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.495 secs, Performance = 3675.746 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.592577e-11, true = 2.592577e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.535 secs, Performance = 3580.254 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.487550e-11, true = 2.487550e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.600 secs, Performance = 3435.253 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.273302e-11, true = 3.273302e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.595 secs, Performance = 3444.738 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 1.843134e-11, true = 1.843134e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.445 secs, Performance = 3802.576 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.678228e-11, true = 4.678228e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.505 secs, Performance = 3518.996 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.345770e-11, true = 3.345770e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.406 secs, Performance = 3767.950 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.623771e-11, true = 2.623771e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.466 secs, Performance = 3747.550 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1050 at 2025-06-23 20:49:18
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1050 at 2025-06-23 20:49:22
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1050 at 2025-06-23 20:49:22
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1050 at 2025-06-23 20:49:22
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     759.065394 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1050.coulomb.1e-14
+GPT :     759.065450 s :    BEGIN_HEADER
+GPT :     759.065459 s : 	HDR_VERSION = 1.0
+GPT :     759.065468 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     759.065478 s : 	STORAGE_FORMAT = 1.0
+GPT :     759.065486 s : 	DIMENSION_1 = 48
+GPT :     759.065492 s : 	DIMENSION_2 = 48
+GPT :     759.065498 s : 	DIMENSION_3 = 48
+GPT :     759.065505 s : 	DIMENSION_4 = 64
+GPT :     759.065511 s : 	CHECKSUM = 2ffd7d1a
+GPT :     759.065518 s : 	LINK_TRACE = 0.669328063622088
+GPT :     759.065524 s : 	PLAQUETTE = 0.628469270316374
+GPT :     759.065530 s : 	BOUNDARY_1 = PERIODIC
+GPT :     759.065537 s : 	BOUNDARY_2 = PERIODIC
+GPT :     759.065543 s : 	BOUNDARY_3 = PERIODIC
+GPT :     759.065548 s : 	BOUNDARY_4 = PERIODIC
+GPT :     759.065553 s : 	ENSEMBLE_ID = ukqcd
+GPT :     759.065558 s : 	SEQUENCE_NUMBER = 1000
+GPT :     759.065563 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     759.065570 s : 	CREATOR_MACHINE = jinchen
+GPT :     759.065576 s : 	CREATION_DATE = Tue May 27 21:10:48 2025
+GPT :     759.065582 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     759.065588 s :    END_HEADER
+GPT :     761.246376 s : Read 3.79688 GB at 1.74218 GB/s (2.2139 GB/s for distribution, 8.17835 GB/s for munged read, 151.993 GB/s for checksum, 21.3318 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.736095e-11, true = 2.736095e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.346 secs, Performance = 4083.277 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.810991e-11, true = 4.810991e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.305 secs, Performance = 4058.790 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.226117e-11, true = 5.226117e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.235 secs, Performance = 4288.860 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.828504e-11, true = 2.828504e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.309 secs, Performance = 4199.132 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.859163e-11, true = 2.859163e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.375 secs, Performance = 3998.128 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.457991e-11, true = 2.457991e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.347 secs, Performance = 4080.754 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.170797e-11, true = 3.170797e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.373 secs, Performance = 4002.187 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.379592e-11, true = 4.379592e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.230 secs, Performance = 4466.721 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.114369e-11, true = 2.114369e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.252 secs, Performance = 4390.163 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.373095e-11, true = 3.373095e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.290 secs, Performance = 4259.465 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.683413e-11, true = 4.683413e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.310 secs, Performance = 4045.029 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.394637e-11, true = 3.394637e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.279 secs, Performance = 4298.175 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.069 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1056 at 2025-06-23 20:50:48
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1056 at 2025-06-23 20:50:50
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1056 at 2025-06-23 20:50:51
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1056 at 2025-06-23 20:50:51
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     837.896753 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1056.coulomb.1e-14
+GPT :     837.896809 s :    BEGIN_HEADER
+GPT :     837.896818 s : 	HDR_VERSION = 1.0
+GPT :     837.896830 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     837.896837 s : 	STORAGE_FORMAT = 1.0
+GPT :     837.896843 s : 	DIMENSION_1 = 48
+GPT :     837.896848 s : 	DIMENSION_2 = 48
+GPT :     837.896854 s : 	DIMENSION_3 = 48
+GPT :     837.896860 s : 	DIMENSION_4 = 64
+GPT :     837.896866 s : 	CHECKSUM = 1f35bedf
+GPT :     837.896873 s : 	LINK_TRACE = 0.668898383884536
+GPT :     837.896878 s : 	PLAQUETTE = 0.628425569688237
+GPT :     837.896883 s : 	BOUNDARY_1 = PERIODIC
+GPT :     837.896890 s : 	BOUNDARY_2 = PERIODIC
+GPT :     837.896896 s : 	BOUNDARY_3 = PERIODIC
+GPT :     837.896903 s : 	BOUNDARY_4 = PERIODIC
+GPT :     837.896908 s : 	ENSEMBLE_ID = ukqcd
+GPT :     837.896913 s : 	SEQUENCE_NUMBER = 1000
+GPT :     837.896919 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     837.896925 s : 	CREATOR_MACHINE = jinchen
+GPT :     837.896932 s : 	CREATION_DATE = Tue May 27 21:17:05 2025
+GPT :     837.896937 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     837.896942 s :    END_HEADER
+GPT :     839.866586 s : Read 3.79688 GB at 1.92874 GB/s (2.54942 GB/s for distribution, 7.92295 GB/s for munged read, 238.523 GB/s for checksum, 39.3303 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.744005e-11, true = 2.744005e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.424 secs, Performance = 3859.472 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.770104e-11, true = 2.770104e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.453 secs, Performance = 3781.136 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.876295e-11, true = 2.876295e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.544 secs, Performance = 3559.654 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.001288e-11, true = 3.001288e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.385 secs, Performance = 3966.613 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.709242e-11, true = 2.709242e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.322 secs, Performance = 4156.499 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.638040e-11, true = 2.638040e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.375 secs, Performance = 3997.695 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.894127e-11, true = 5.894127e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.324 secs, Performance = 4000.272 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.094823e-11, true = 2.094823e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.392 secs, Performance = 3948.556 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.434688e-11, true = 2.434688e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.443 secs, Performance = 3807.737 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.476751e-11, true = 4.476751e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.346 secs, Performance = 3936.878 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 6.060253e-11, true = 6.060253e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.287 secs, Performance = 4115.891 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.976928e-11, true = 2.976928e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.359 secs, Performance = 4043.179 GFLOPS
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.070 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1062 at 2025-06-23 20:52:08
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1062 at 2025-06-23 20:52:11
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+
+Processing configuration 1062 at 2025-06-23 20:52:11
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+
+Processing configuration 1062 at 2025-06-23 20:52:11
+performGaugeSmearQuda: step 000 plaquette (mean 0.0000000000000000e+00, spatial 2.5885719720941266e-317 temporal 2.6295043227207822e-317) Q charge = 0.0000000000000000e+00
+GPT :     925.509799 s : NERSC file format; reading /lustre1/pion3d/ensemble/l4864f21b7373m00125m0250a.nersc.cg_high_prec/fixed_GLU/l4864f21b7373m00125m0250a.1062.coulomb.1e-14
+GPT :     925.509854 s :    BEGIN_HEADER
+GPT :     925.509862 s : 	HDR_VERSION = 1.0
+GPT :     925.509875 s : 	DATATYPE = 4D_SU3_GAUGE
+GPT :     925.509882 s : 	STORAGE_FORMAT = 1.0
+GPT :     925.509890 s : 	DIMENSION_1 = 48
+GPT :     925.509895 s : 	DIMENSION_2 = 48
+GPT :     925.509900 s : 	DIMENSION_3 = 48
+GPT :     925.509907 s : 	DIMENSION_4 = 64
+GPT :     925.509912 s : 	CHECKSUM = 1e9d3ae
+GPT :     925.509917 s : 	LINK_TRACE = 0.669388208215622
+GPT :     925.509924 s : 	PLAQUETTE = 0.628399236918295
+GPT :     925.509931 s : 	BOUNDARY_1 = PERIODIC
+GPT :     925.509937 s : 	BOUNDARY_2 = PERIODIC
+GPT :     925.509943 s : 	BOUNDARY_3 = PERIODIC
+GPT :     925.509948 s : 	BOUNDARY_4 = PERIODIC
+GPT :     925.509953 s : 	ENSEMBLE_ID = ukqcd
+GPT :     925.509959 s : 	SEQUENCE_NUMBER = 1000
+GPT :     925.509964 s : 	ENSEMBLE_LABEL = 2+1F_isoClover_130MeV
+GPT :     925.509971 s : 	CREATOR_MACHINE = jinchen
+GPT :     925.509978 s : 	CREATION_DATE = Tue May 27 21:23:31 2025
+GPT :     925.509986 s : 	FLOATING_POINT = IEEE64BIG
+GPT :     925.509993 s :    END_HEADER
+GPT :     927.712116 s : Read 3.79688 GB at 1.72516 GB/s (2.19616 GB/s for distribution, 8.0444 GB/s for munged read, 218.567 GB/s for checksum, 22.8644 GB/s for munging, 4 readers)
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 5.353030e-11, true = 5.353030e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.297 secs, Performance = 4084.132 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.618757e-11, true = 2.618757e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.309 secs, Performance = 4197.772 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.721515e-11, true = 2.721515e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.288 secs, Performance = 4266.568 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 7.428962e-11, true = 7.428962e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.216 secs, Performance = 4354.511 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.566128e-11, true = 4.566128e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.260 secs, Performance = 4203.584 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.384666e-11, true = 2.384666e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.234 secs, Performance = 4453.113 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.656602e-11, true = 2.656602e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.237 secs, Performance = 4443.532 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 3.826738e-11, true = 3.826738e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.233 secs, Performance = 4294.535 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.792837e-11, true = 4.792837e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.256 secs, Performance = 4216.087 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 4.646856e-11, true = 4.646856e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.251 secs, Performance = 4233.392 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.414891e-11, true = 2.414891e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.308 secs, Performance = 4203.034 GFLOPS
+GCR: Convergence at 12 iterations, L2 relative residual: iterated = 2.597207e-11, true = 2.597207e-11 (requested = 1.000000e-10)
+PyQUDA INFO: Time = 1.376 secs, Performance = 3992.940 GFLOPS
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.068 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+>>> Contraction time: 0.067 seconds
+>>> Shift time: 0.009 seconds
+latt_info.Lt:  16
+pion_DA_tmp shape:  (1, 8, 64)
+>>> Mean value of pion_DA: 
+ [[-4.56875478e-04  2.59510459e-02  3.89965501e-03  1.49304755e-03
+   9.72337048e-04  7.19948462e-04  5.63589788e-04  4.51974789e-04
+   3.67328897e-04  3.01126789e-04  2.48460277e-04  2.06130575e-04
+   1.70452937e-04  1.41156112e-04  1.16615614e-04  9.61912153e-05
+   7.90111310e-05  6.48459781e-05  5.33833990e-05  4.41209331e-05]
+ [-2.33172687e-04  9.18160421e-03  2.53047726e-03  1.28904757e-03
+   9.07975193e-04  6.83060816e-04  5.35654152e-04  4.29430286e-04
+   3.50427472e-04  2.87683102e-04  2.37339048e-04  1.96991593e-04
+   1.62897926e-04  1.34834340e-04  1.11225898e-04  9.16559789e-05
+   7.52555255e-05  6.17805624e-05  5.09142832e-05  4.20658190e-05]
+ [-2.41914163e-04  4.14560728e-03  1.72199227e-03  1.06007231e-03
+   7.99866596e-04  6.16990581e-04  4.84828998e-04  3.88118664e-04
+   3.20234703e-04  2.63909387e-04  2.17655751e-04  1.80814404e-04
+   1.49486831e-04  1.23450101e-04  1.01366659e-04  8.34044896e-05
+   6.83828170e-05  5.61756220e-05  4.64068220e-05  3.83036643e-05]
+ [-2.97902570e-04  2.29612089e-03  1.26943675e-03  8.74419275e-04
+   6.90544711e-04  5.48039291e-04  4.31030373e-04  3.44050978e-04
+   2.88128490e-04  2.38923076e-04  1.96948498e-04  1.63742632e-04
+   1.35262376e-04  1.11204549e-04  9.05232309e-05  7.44588884e-05
+   6.09069197e-05  5.00607989e-05  4.14782612e-05  3.41939458e-05]
+ [-1.85713249e-04  1.43565193e-03  9.70483262e-04  7.19853562e-04
+   5.87624527e-04  4.81217231e-04  3.78247424e-04  3.00768213e-04
+   2.56317169e-04  2.14500225e-04  1.76905625e-04  1.46979810e-04
+   1.21270806e-04  9.89540650e-05  7.95529988e-05  6.55917987e-05
+   5.34561656e-05  4.39610614e-05  3.65404080e-05  3.00852257e-05]
+ [-1.09274655e-04  9.83070944e-04  7.52435291e-04  5.91343312e-04
+   4.94201044e-04  4.18408131e-04  3.28303576e-04  2.59650676e-04
+   2.25698026e-04  1.91009483e-04  1.57888911e-04  1.30803066e-04
+   1.07775390e-04  8.70024506e-05  6.88720082e-05  5.71039831e-05
+   4.63252033e-05  3.81340047e-05  3.17648655e-05  2.61306545e-05]
+ [-5.45878696e-05  7.13088041e-04  5.87904662e-04  4.84633065e-04
+   4.11290565e-04  3.61199088e-04  2.82346297e-04  2.21729125e-04
+   1.97082377e-04  1.68528934e-04  1.39783935e-04  1.15387965e-04
+   9.48677573e-05  7.56213016e-05  5.87982533e-05  4.91289429e-05
+   3.97194789e-05  3.27638919e-05  2.72763206e-05  2.24452906e-05]
+ [-5.57370966e-05  5.26576793e-04  4.61062957e-04  3.96038437e-04
+   3.38701184e-04  3.10287664e-04  2.40874957e-04  1.87912503e-04
+   1.70867329e-04  1.47143348e-04  1.22500637e-04  1.00853934e-04
+   8.26540795e-05  6.51012994e-05  4.95272702e-05  4.17955772e-05
+   3.37478224e-05  2.79175487e-05  2.31638153e-05  1.91039965e-05]]
+WARNING: Environment variable QUDA_PROFILE_OUTPUT_BASE not set; writing to profile.tsv and profile_async.tsv
+Saving 477 sets of cached parameters to .cache/profile_0.tsv
+Saving 0 sets of cached profiles to .cache/profile_async_0.tsv
+
+               initQuda Total time =     0.158 secs
+                     init     =     0.157 secs ( 99.662%),	 with        2 calls at 7.867e+04 us per call
+        total accounted       =     0.157 secs ( 99.662%)
+        total missing         =     0.001 secs (  0.338%)
+
+          loadGaugeQuda Total time =    11.379 secs
+                 download     =     4.070 secs ( 35.765%),	 with       30 calls at 1.357e+05 us per call
+                   upload     =     1.769 secs ( 15.546%),	 with       10 calls at 1.769e+05 us per call
+                     init     =     0.363 secs (  3.191%),	 with      268 calls at 1.355e+03 us per call
+                  compute     =     0.015 secs (  0.133%),	 with       70 calls at 2.168e+02 us per call
+                    comms     =     4.929 secs ( 43.321%),	 with       28 calls at 1.761e+05 us per call
+                     free     =     0.093 secs (  0.819%),	 with       95 calls at 9.806e+02 us per call
+        total accounted       =    11.239 secs ( 98.775%)
+        total missing         =     0.139 secs (  1.225%)
+
+         loadCloverQuda Total time =     0.984 secs
+                     init     =     0.038 secs (  3.891%),	 with       50 calls at 7.657e+02 us per call
+                  compute     =     0.190 secs ( 19.318%),	 with       30 calls at 6.335e+03 us per call
+                    comms     =     0.598 secs ( 60.769%),	 with       10 calls at 5.979e+04 us per call
+                     free     =     0.066 secs (  6.759%),	 with       46 calls at 1.446e+03 us per call
+        total accounted       =     0.893 secs ( 90.737%)
+        total missing         =     0.091 secs (  9.263%)
+
+             invertQuda Total time =   572.525 secs
+                     init     =     7.820 secs (  1.366%),	 with    13737 calls at 5.692e+02 us per call
+                 preamble     =    26.602 secs (  4.646%),	 with    15300 calls at 1.739e+03 us per call
+                  compute     =   525.165 secs ( 91.728%),	 with      902 calls at 5.822e+05 us per call
+                 epilogue     =     5.744 secs (  1.003%),	 with      720 calls at 7.978e+03 us per call
+                     free     =     2.314 secs (  0.404%),	 with     5253 calls at 4.405e+02 us per call
+        total accounted       =   567.645 secs ( 99.148%)
+        total missing         =     4.881 secs (  0.852%)
+
+     invertMultiSrcQuda Total time =   178.186 secs
+                     init     =     4.577 secs (  2.569%),	 with    39405 calls at 1.162e+02 us per call
+                 preamble     =    19.112 secs ( 10.726%),	 with    10511 calls at 1.818e+03 us per call
+                  compute     =   148.871 secs ( 83.548%),	 with    97218 calls at 1.531e+03 us per call
+                 epilogue     =     2.348 secs (  1.318%),	 with     3503 calls at 6.703e+02 us per call
+                     free     =     3.193 secs (  1.792%),	 with     5140 calls at 6.212e+02 us per call
+                    eigen     =     0.020 secs (  0.011%),	 with     6767 calls at 2.890e+00 us per call
+        total accounted       =   178.121 secs ( 99.963%)
+        total missing         =     0.065 secs (  0.037%)
+
+   gaugeObservablesQuda Total time =     0.000 secs
+
+         gaugeSmearQuda Total time =    20.341 secs
+                     init     =     0.052 secs (  0.257%),	 with       60 calls at 8.718e+02 us per call
+                  compute     =    17.226 secs ( 84.690%),	 with       10 calls at 1.723e+06 us per call
+                    comms     =     2.619 secs ( 12.874%),	 with       10 calls at 2.619e+05 us per call
+                     free     =     0.083 secs (  0.407%),	 with       50 calls at 1.655e+03 us per call
+        total accounted       =    19.980 secs ( 98.228%)
+        total missing         =     0.360 secs (  1.772%)
+
+                endQuda Total time =     0.157 secs
+                     free     =     0.008 secs (  5.072%),	 with       20 calls at 3.983e+02 us per call
+        total accounted       =     0.008 secs (  5.072%)
+        total missing         =     0.149 secs ( 94.928%)
+
+       initQuda-endQuda Total time =   948.081 secs
+
+                   QUDA Total time =   783.730 secs
+                 download     =     4.070 secs (  0.519%),	 with       30 calls at 1.357e+05 us per call
+                   upload     =     1.769 secs (  0.226%),	 with       10 calls at 1.769e+05 us per call
+                     init     =    13.009 secs (  1.660%),	 with    53522 calls at 2.431e+02 us per call
+                 preamble     =    45.715 secs (  5.833%),	 with    25811 calls at 1.771e+03 us per call
+                  compute     =   691.469 secs ( 88.228%),	 with    98230 calls at 7.039e+03 us per call
+                    comms     =     8.146 secs (  1.039%),	 with       48 calls at 1.697e+05 us per call
+                 epilogue     =     8.092 secs (  1.033%),	 with     4223 calls at 1.916e+03 us per call
+                     free     =     5.758 secs (  0.735%),	 with    10604 calls at 5.430e+02 us per call
+                    eigen     =     0.020 secs (  0.002%),	 with     6767 calls at 2.892e+00 us per call
+        total accounted       =   778.047 secs ( 99.275%)
+        total missing         =     5.682 secs (  0.725%)
+
+Device memory used = 33767.6 MiB
+Pinned device memory used = 0.0 MiB
+Managed memory used = 0.0 MiB
+Shmem memory used = 0.0 MiB
+Page-locked host memory used = 1473.0 MiB
+Total host memory used >= 1645.8 MiB
+
+
+>>> End time: Mon Jun 23 20:53:42 CDT 2025
+
+>>> Total runtime: 0:16:10
