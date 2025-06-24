@@ -79,6 +79,11 @@ for cfg in conf_num_ls:
     #!
     
 
+    if latt_info.mpi_rank == 0:
+        cp.cuda.runtime.deviceSynchronize()
+        start_tloop = time.time()
+
+
     # pion_DA_tmp = cp.zeros((len(t_src_list), len(z_list), latt_info.Lt), "<c16")
     gpt_DA_tmp = []
 
@@ -108,30 +113,36 @@ for cfg in conf_num_ls:
             start_contract = time.time()
             
             
-            # #! contract
+            #! contract
             # pion_DA_tmp[t_idx, z] = contract(
             #     "wtzyxklba,wtzyxklba->t",
             #     point_propag_backward_data,
             #     point_propag_shift.data,
             # )
-            # #!
+            #!
             
-            #! GPT slice_trDA
-            gpt_temp = np.real( np.array( g.slice(g.trace(
-                g.gamma[5] * g.gamma[5]
-                * g.adj( gpt_propag )
-                * g.gamma["T"]
-                * g.eval( g.cshift( gpt_propag, 2, z ) )
-            ), 3) ) )
-            gpt_DA_tmp[t_idx].append(gpt_temp)
+            # #! GPT slice_trDA
+            # gpt_temp = np.real( np.array( g.slice(g.trace(
+            #     g.gamma[5] * g.gamma[5]
+            #     * g.adj( gpt_propag )
+            #     * g.gamma["T"]
+            #     * g.eval( g.cshift( gpt_propag, 2, z ) )
+            # ), 3) ) )
+            # gpt_DA_tmp[t_idx].append(gpt_temp)
+            
+            lhs = g.gamma[5] * g.gamma[5] * g.adj(gpt_propag)
+            rhs = g.gamma["T"] * g.eval(g.cshift(gpt_propag, 2, z))
+            mom = [g.identity(g.complex(grid))]
+            gpt_temp = np.real(np.array(g.slice_trDA(lhs, rhs, mom, 3)))
+            gpt_DA_tmp[t_idx].append(gpt_temp[0][0][0])
             
             cp.cuda.runtime.deviceSynchronize()
             end_contract = time.time()
             print(f">>> Contraction time: {end_contract - start_contract:.3f} seconds")
             
-            # # Time the shift operation
-            # cp.cuda.runtime.deviceSynchronize()
-            # start_shift = time.time()
+            # Time the shift operation
+            cp.cuda.runtime.deviceSynchronize()
+            start_shift = time.time()
             
             #! use gauge.pure_gauge.covDev to shift each fermion's data
             # unit = LatticeGauge(latt_info)
@@ -149,14 +160,19 @@ for cfg in conf_num_ls:
             # point_propag_shift = point_propag_shift.shift(-1, Z)
             #!
             
-            # cp.cuda.runtime.deviceSynchronize()
-            # end_shift = time.time()
-            # print(f">>> Shift time: {end_shift - start_shift:.3f} seconds")
+            cp.cuda.runtime.deviceSynchronize()
+            end_shift = time.time()
+            print(f">>> Shift time: {end_shift - start_shift:.3f} seconds")
                     
     # Gather and average over spatial lattice
     # pion_DA_tmp = core.gatherLattice(pion_DA_tmp.real.get(), [2, -1, -1, -1]) # 2 means the t-axis is the 2-nd axis
     
     pion_DA_tmp = np.array(gpt_DA_tmp)
+    
+    if latt_info.mpi_rank == 0:
+        cp.cuda.runtime.deviceSynchronize()
+        end_tloop = time.time()
+        print(f">>> Total T-loop time: {end_tloop - start_tloop:.3f} seconds")
 
     if latt_info.mpi_rank == 0:
         print("latt_info.Lt: ", latt_info.Lt)
